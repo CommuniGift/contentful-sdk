@@ -77,7 +77,7 @@ abstract class ClientBase
             ], $headers)
         ]);
 
-        $result = json_decode($result->getBody(), true);
+        $result = json_decode($result->getBody());
         if ($this->cacher) $this->cacher->put($key, $result);
         return $result;
     }
