@@ -3,14 +3,16 @@ namespace Incraigulous\ContentfulSDK;
 
 use GuzzleHttp;
 
-abstract class ClientBase {
+abstract class ClientBase
+{
     protected $client;
     protected $spaceId;
     protected $accessToken;
     protected $endpointBase;
     protected $cacher;
 
-    function __construct($accessToken, $spaceId = null, CacherInterface $cacher = null) {
+    function __construct($accessToken, $spaceId = null, CacherInterface $cacher = null)
+    {
         $this->accessToken = $accessToken;
         $this->spaceId = $spaceId;
         $this->setClient(new GuzzleHttp\Client());
@@ -21,7 +23,8 @@ abstract class ClientBase {
      * Get the Guzzle Client.
      * @return GuzzleHttp\Client
      */
-    function getClient() {
+    function getClient()
+    {
         return $this->client;
     }
 
@@ -29,7 +32,8 @@ abstract class ClientBase {
      * Set the Guzzle Client.
      * @return GuzzleHttp\Client
      */
-    function setClient(GuzzleHttp\Client $client) {
+    function setClient(GuzzleHttp\Client $client)
+    {
         $this->client = $client;
     }
 
@@ -37,7 +41,8 @@ abstract class ClientBase {
      * Format the authorization header.
      * @return string
      */
-    function getBearer() {
+    function getBearer()
+    {
         return ' Bearer ' . $this->accessToken;
     }
 
@@ -45,7 +50,8 @@ abstract class ClientBase {
      * Get the endpoint.
      * @return string
      */
-    function getEndpoint() {
+    function getEndpoint()
+    {
         $endpoint = $this->endpointBase;
         if ($this->spaceId) {
             $endpoint .= '/' . $this->spaceId;
@@ -60,7 +66,8 @@ abstract class ClientBase {
      * @param array $headers
      * @return mixed
      */
-    function get($resource, $query = array(), $headers = array()) {
+    function get($resource, $query = array(), $headers = array())
+    {
         $url = $this->build_url($resource, $query);
         $key = $this->buildCacheKey('get', $resource, $url, $headers, $query);
         if (($this->cacher) && ($this->cacher->has($key))) return $this->cacher->get($key);
@@ -68,7 +75,9 @@ abstract class ClientBase {
             'headers' => array_merge([
                 'Authorization' => $this->getBearer()
             ], $headers)
-        ])->json();
+        ]);
+
+        $result = json_decode($result->getBody(), true);
         if ($this->cacher) $this->cacher->put($key, $result);
         return $result;
     }
@@ -79,7 +88,8 @@ abstract class ClientBase {
      * @param $query
      * @return string
      */
-    function build_url($resource, array $query = array()) {
+    function build_url($resource, array $query = array())
+    {
         $url = $this->getEndpoint();
         if ($resource && $this->spaceId) $url .= '/';
         if ($resource) $url .= $resource;
@@ -96,7 +106,8 @@ abstract class ClientBase {
      * @param array $headers
      * @return string
      */
-    function buildCacheKey($method, $resource, $url, $headers = array(), $query = array()) {
+    function buildCacheKey($method, $resource, $url, $headers = array(), $query = array())
+    {
         return md5($method . $resource . $url . json_encode($query) . json_encode($headers));
     }
 }
