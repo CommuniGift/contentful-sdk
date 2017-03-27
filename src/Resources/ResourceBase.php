@@ -5,7 +5,8 @@ namespace Incraigulous\ContentfulSDK\Resources;
 use Incraigulous\ContentfulSDK\RequestDecorator;
 use Incraigulous\ContentfulSDK\CacherInterface;
 
-abstract class ResourceBase {
+abstract class ResourceBase
+{
     protected $clientClassName = 'Incraigulous\ContentfulSDK\DeliveryClient';
     protected $resourceName;
     protected $spaceId;
@@ -25,7 +26,8 @@ abstract class ResourceBase {
     /**
      * Init and store a new client and decorator.
      */
-    function refresh() {
+    function refresh()
+    {
         $this->client = new $this->clientClassName($this->accessToken, $this->spaceId, $this->cacher);
         $this->requestDecorator = new RequestDecorator();
         $this->requestDecorator->setResource($this->resourceName);
@@ -147,7 +149,7 @@ abstract class ResourceBase {
      */
     function order($orderBy, $reverse = false)
     {
-        $this->requestDecorator->addParameter('order', ($reverse) ? "=" : "=-", $orderBy);
+        $this->requestDecorator->addParameter('order', '=', ($reverse ? "-" : "") . $orderBy);
         return $this;
     }
 
@@ -196,7 +198,8 @@ abstract class ResourceBase {
     /**
      * Return the decorator.
      */
-    function decorator() {
+    function decorator()
+    {
         return $this->requestDecorator;
     }
 }
